@@ -8,22 +8,30 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.Table;
 
 /* 
 Represents a User in the system.
-A user has a name, password.
+A user has a An ID, email, first name, last name and password.
  */
 @Entity
 @Table(name = "users")
+@NamedNativeQuery(name = "User.getByEmail", query = "SELECT * FROM users WHERE email = ?", resultClass = User.class)
 public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private BigInteger userid;
+	private BigInteger id;
 
 	@Column(nullable = false)
-	private String name;
+	private String firstName;
+
+	@Column(nullable = false)
+	private String lastName;
+
+	@Column(nullable = false)
+	private String email;
 
 	@Column(nullable = false)
 	private String password;
@@ -31,27 +39,49 @@ public class User {
 	public User() {
 	}
 
-	public User(String name, String password) {
-		this.setName(name);
+	public User(String email, String firstName, String lastName, String password) {
+		this.setEmail(email);
+		this.setFirstName(firstName);
+		this.setLastName(lastName);
 		this.setPassword(password);
 	}
 
-	public BigInteger getUserid() {
-		return this.userid;
+	public BigInteger getId() {
+		return this.id;
 	}
 
-	public String getName() {
-		return name;
+	public String getFirstName() {
+		return this.firstName;
 	}
 
-	public void setName(String name) {
-		if (name == null || name.isEmpty())
-			throw new InvalidParameterException("Name is empty or null");
-		this.name = name;
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public String getEmail() {
+		return this.email;
 	}
 
 	public String getPassword() {
 		return this.password;
+	}
+
+	public void setFirstName(String firstName) {
+		if (firstName == null || firstName.isEmpty())
+			throw new InvalidParameterException("First name is empty or null");
+		this.firstName = firstName;
+	}
+
+	public void setLastName(String lastName) {
+		if (lastName == null || lastName.isEmpty())
+			throw new InvalidParameterException("Last name is empty or null");
+		this.lastName = lastName;
+	}
+
+	public void setEmail(String email) {
+		if (email == null || email.isEmpty())
+			throw new InvalidParameterException("Email is empty or null");
+		this.email = email;
 	}
 
 	public void setPassword(String password) {

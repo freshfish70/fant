@@ -1,9 +1,11 @@
 create table "users"
 (
-	userid serial
+	id serial
 		constraint user_pk
 			primary key,
-	name varchar not null,
+	firstName varchar not null,
+	lastName varchar not null,
+	email varchar not null,
 	password varchar not null
 );
 
