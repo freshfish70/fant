@@ -17,8 +17,10 @@ A user has a An ID, email, first name, last name and password.
  */
 @Entity
 @Table(name = "users")
-@NamedNativeQuery(name = "User.getByEmail", query = "SELECT * FROM users WHERE email = ?", resultClass = User.class)
+@NamedNativeQuery(name = User.USER_BY_EMAIL, query = "SELECT * FROM users WHERE email = ?", resultClass = User.class)
 public class User {
+
+	public static final String USER_BY_EMAIL = "User.getByEmail";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
