@@ -30,4 +30,8 @@ public class KeyService {
 		return Response.ok(keyResult.toString()).build();
 	}
 
+	public KeyManager getKeyManager() {
+		return this.keyManager;
+	}
+
 }
