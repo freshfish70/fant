@@ -28,7 +28,7 @@ public class KeyManager {
 	}
 
 	private KeyPair createKeyPair() {
-		return Keys.keyPairFor(SignatureAlgorithm.ES256);
+		return Keys.keyPairFor(SignatureAlgorithm.RS256);
 	}
 
 	private KeyPair readKeyPair() {
