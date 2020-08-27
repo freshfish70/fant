@@ -19,4 +19,6 @@
   <library id="postgresql-library">
     <file name="${server.config.dir}/postgresql-42.2.16.jar" />
   </library>
+
+  <mpJwt id="defaultMpJwt" audiences="aud"></mpJwt>
 </server>
