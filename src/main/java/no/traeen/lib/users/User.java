@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedNativeQuery;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /* 
@@ -17,7 +17,8 @@ A user has a An ID, email, first name, last name and password.
  */
 @Entity
 @Table(name = "users")
-@NamedNativeQuery(name = User.USER_BY_EMAIL, query = "SELECT * FROM users WHERE email = ?", resultClass = User.class)
+@NamedQuery(name = User.USER_BY_EMAIL, query = "SELECT e FROM User e WHERE e.email = :email")
+
 public class User {
 
 	public static final String USER_BY_EMAIL = "User.getByEmail";
