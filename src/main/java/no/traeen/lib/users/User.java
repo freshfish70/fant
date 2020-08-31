@@ -2,13 +2,17 @@ package no.traeen.lib.users;
 
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 
 /* 
@@ -39,6 +43,10 @@ public class User {
 	@Column(nullable = false)
 	private String password;
 
+	@ManyToMany
+	@JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "email", referencedColumnName = "email"), inverseJoinColumns = @JoinColumn(name = "name", referencedColumnName = "name"))
+	List<Group> groups;
+
 	public User() {
 	}
 
@@ -67,6 +75,10 @@ public class User {
 
 	public String getPassword() {
 		return this.password;
+	}
+
+	public List<Group> getGroups() {
+		return this.groups;
 	}
 
 	public void setFirstName(String firstName) {
