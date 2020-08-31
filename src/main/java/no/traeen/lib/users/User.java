@@ -41,6 +41,7 @@ public class User {
 	private String email;
 
 	@Column(nullable = false)
+	@JsonbTransient
 	private String password;
 
 	@ManyToMany
