@@ -2,8 +2,10 @@ package no.traeen.lib.users;
 
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.json.bind.annotation.JsonbTransient;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -79,7 +81,10 @@ public class User {
 	}
 
 	public List<Group> getGroups() {
-		return this.groups;
+		if (groups == null) {
+			groups = new ArrayList<>();
+		}
+		return groups;
 	}
 
 	public void setFirstName(String firstName) {
