@@ -9,7 +9,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.security.enterprise.credential.UsernamePasswordCredential;
 import javax.security.enterprise.identitystore.CredentialValidationResult;
 import javax.security.enterprise.identitystore.IdentityStoreHandler;
@@ -34,6 +36,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.InvalidKeyException;
+import no.traeen.lib.users.User;
 
 @Path("authentication")
 @ApplicationScoped
@@ -61,9 +64,17 @@ public class AuthenticationService {
 	@Inject
 	PasswordHash hasher;
 
+	/**
+	 * Authenticates a user if providing a correct email/password combination.
+	 * Returns a JWT token on success else an error response.
+	 * 
+	 * @param email    the email of the user
+	 * @param password the password of the user
+	 * @param request  http request
+	 * @return JSON Response
+	 */
 	@POST
 	@Path("login")
-
 	public Response login(@HeaderParam("email") String email, @HeaderParam("password") String password,
 			@Context HttpServletRequest request) {
 
@@ -83,6 +94,13 @@ public class AuthenticationService {
 		return response.build();
 	}
 
+	/**
+	 * 
+	 * @param name    name of the subject
+	 * @param groups  groups to include in the JWT
+	 * @param request http request
+	 * @return returns JWT token or empty string
+	 */
 	private String generateToken(String name, Set<String> groups, HttpServletRequest request) {
 		try {
 			Date now = new Date();
@@ -103,7 +121,17 @@ public class AuthenticationService {
 	@Path("create")
 	public Response createUser(@HeaderParam("firstname") String firstname, @HeaderParam("lastname") String lastname,
 			@HeaderParam("password") String password, @HeaderParam("email") String email) {
+		try {
+			User user = em.createNamedQuery(User.USER_BY_EMAIL, User.class).setParameter("email", email)
+					.getSingleResult();
+		} catch (NoResultException e) {
+			User newUser = new User(email, firstname, lastname, hasher.generate(password.toCharArray()));
+			em.merge(newUser);
+		} catch (PersistenceException e) {
+
+		}
 		return Response.ok().build();
+
 	}
 
 	@POST
