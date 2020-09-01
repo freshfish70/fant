@@ -1,5 +1,6 @@
 package no.traeen.lib.users;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -16,6 +17,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQuery;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /* 
 Represents a User in the system.
@@ -25,7 +29,7 @@ A user has a An ID, email, first name, last name and password.
 @Table(name = "users")
 @NamedQuery(name = User.USER_BY_EMAIL, query = "SELECT e FROM User e WHERE e.email = :email")
 
-public class User {
+public class User implements Serializable {
 
 	public static final String USER_BY_EMAIL = "User.getByEmail";
 
@@ -34,16 +38,20 @@ public class User {
 	private BigInteger id;
 
 	@Column(nullable = false)
+	@NotBlank
 	private String firstName;
 
 	@Column(nullable = false)
+	@NotBlank
 	private String lastName;
 
 	@Column(nullable = false)
+	@Email
 	private String email;
 
 	@Column(nullable = false)
 	@JsonbTransient
+	@Size(min = 6)
 	private String password;
 
 	@ManyToMany

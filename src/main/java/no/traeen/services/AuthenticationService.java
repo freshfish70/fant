@@ -36,6 +36,7 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.InvalidKeyException;
+import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
 
 @Path("authentication")
@@ -124,11 +125,15 @@ public class AuthenticationService {
 		try {
 			User user = em.createNamedQuery(User.USER_BY_EMAIL, User.class).setParameter("email", email)
 					.getSingleResult();
+			// Return error
 		} catch (NoResultException e) {
-			User newUser = new User(email, firstname, lastname, hasher.generate(password.toCharArray()));
+			User newUser = new User(email, firstname, lastname, password);
+			Group usergroup = em.find(Group.class, Group.USER_GROUP_NAME);
+			newUser.setPassword(hasher.generate(password.toCharArray()));
+			newUser.getGroups().add(usergroup);
 			em.merge(newUser);
 		} catch (PersistenceException e) {
-
+			// Return Error
 		}
 		return Response.ok().build();
 
