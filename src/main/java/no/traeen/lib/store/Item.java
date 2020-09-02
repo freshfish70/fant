@@ -5,11 +5,15 @@ import java.math.BigInteger;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
@@ -36,9 +40,8 @@ public class Item implements Serializable {
 
 	private String description;
 
-	@OneToOne
-	@JoinColumn(name = "image", referencedColumnName = "id", nullable = true)
-	private Image image;
+	@OneToMany(mappedBy = "owner", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Image> image;
 
 	private boolean sold;
 
@@ -104,11 +107,11 @@ public class Item implements Serializable {
 		this.description = description;
 	}
 
-	public Image getImage() {
+	public Set<Image> getImage() {
 		return this.image;
 	}
 
-	public void setImage(Image image) {
+	public void setImage(Set<Image> image) {
 		this.image = image;
 	}
 
