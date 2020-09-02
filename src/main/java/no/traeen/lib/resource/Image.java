@@ -3,10 +3,13 @@ package no.traeen.lib.resource;
 import java.io.Serializable;
 import java.math.BigInteger;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import no.traeen.lib.store.Item;
@@ -29,10 +32,13 @@ public class Image implements Serializable {
 
 	private String name;
 
+	@Column(name = "mime_type")
 	private String mimeType;
 
-	private String size;
+	private float size;
 
+	@JoinColumn(name = "owner", referencedColumnName = "id", nullable = true)
+	@ManyToOne
 	private Item owner;
 
 	public Image() {
