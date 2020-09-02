@@ -35,4 +35,44 @@ public class Image implements Serializable {
 
 	private Item owner;
 
+	public Image() {
+
+	}
+
+	public BigInteger getId() {
+		return this.id;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getMimeType() {
+		return this.mimeType;
+	}
+
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+
+	public float getSize() {
+		return this.size;
+	}
+
+	public void setSize(float size) {
+		this.size = size;
+	}
+
+	public Item getOwner() {
+		return this.owner;
+	}
+
+	public void setOwner(Item owner) {
+		this.owner = owner;
+	}
+
 }
