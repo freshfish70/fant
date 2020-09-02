@@ -146,9 +146,22 @@ public class AuthenticationService {
 		return Response.ok(tk.getGroups()).build();
 	}
 
-	// public User getCurrentUser() {
-	// return new User();
-	// }
+	@GET
+	@Path("currentuser")
+	@RolesAllowed(value = { Group.USER_GROUP_NAME })
+	@Produces(MediaType.APPLICATION_JSON)
+	public User getCurrentUser() {
+		return getCurrentUser(tk.getName());
+	}
+
+	public User getCurrentUser(String email) {
+		try {
+			return em.createNamedQuery(User.USER_BY_EMAIL, User.class).setParameter("email", email).getSingleResult();
+		} catch (Exception e) {
+		}
+		return null;
+
+	}
 
 	// /** Change password of current user or any user if current user has the role
 	// of
