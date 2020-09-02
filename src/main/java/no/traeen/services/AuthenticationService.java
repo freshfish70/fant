@@ -23,6 +23,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
@@ -164,10 +165,15 @@ public class AuthenticationService {
 
 	}
 
-	// /** Change password of current user or any user if current user has the role
-	// of
-	// administrator */
-	// public Response changePassword(String userid, String password) {
+	@PUT
+	@Path("changepassword")
+	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
+	public Response changePassword(@HeaderParam("password") String newPassword) {
 
-	// }
+		User user = getCurrentUser();
+		user.setPassword(hasher.generate(newPassword.toCharArray()));
+		em.merge(user);
+		return Response.ok().build();
+
+	}
 }
