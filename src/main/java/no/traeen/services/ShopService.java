@@ -19,21 +19,18 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
-import javax.activation.MimetypesFileTypeMap;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Form;
-import javax.ws.rs.core.HttpHeaders;
+
 import javax.ws.rs.core.Response;
 
 import com.ibm.websphere.jaxrs20.multipart.IAttachment;
@@ -41,14 +38,9 @@ import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
-import org.glassfish.jersey.media.multipart.ContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import javax.security.enterprise.identitystore.IdentityStoreHandler;
-import javax.servlet.annotation.MultipartConfig;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
