@@ -154,30 +154,12 @@ public class ShopService {
 		return images;
 	}
 
-	// @POST
-	// @Path("te")
-	// @Consumes(MediaType.MULTIPART_FORM_DATA)
-	// @Produces(MediaType.APPLICATION_JSON)
-	// public Response te(@FormDataParam("image") InputStream fileStream) {
-	// try {
-	// String name = details.getName();
-	// Files.copy(fileStream, Paths.get(name));
-	// } catch (IOException e) {
-	// // TODO Auto-generated catch block
-	// e.printStackTrace();
-	// }
-	// return Response.ok(details).build();
-	// // return Response.ok().build();
-	// }
-
-	@POST
+	@GET
 	@Path("getitem")
 	public Response getItem(@HeaderParam("id") Integer id) {
-		Object nid = BigInteger.valueOf(id);
-		// Item w = em.find(Item.class, (nid));
-		// Item e = new Item(name, description, price, w);
-		// em.persist(e);
-		return Response.ok().build();
+		Object itemId = BigInteger.valueOf(id);
+		Item item = em.find(Item.class, (itemId));
+		return Response.ok(item).build();
 	}
 
 	@DELETE
