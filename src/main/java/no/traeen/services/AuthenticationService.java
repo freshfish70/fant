@@ -20,6 +20,7 @@ import javax.security.enterprise.identitystore.CredentialValidationResult.Status
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -85,7 +86,7 @@ public class AuthenticationService {
 			CredentialValidationResult result = identityStoreHandler
 					.validate(new UsernamePasswordCredential(email, password));
 			if (result.getStatus() == Status.VALID) {
-				String token = generateToken(result.getCallerPrincipal().getName(), result.getCallerGroups(), request);
+				String token = generateToken(email, result.getCallerGroups(), request);
 				response = Response.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 			}
 		} catch (Exception e) {
