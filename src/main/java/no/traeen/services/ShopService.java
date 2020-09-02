@@ -72,6 +72,9 @@ public class ShopService {
 	@Inject
 	JsonWebToken tk;
 
+	@Inject
+	AuthenticationService authenticationService;
+
 	@POST
 	@Path("purchase")
 	public Response purchaseItem(long itemId) {
@@ -164,7 +167,15 @@ public class ShopService {
 
 	@DELETE
 	@Path("deleteitem")
-	public Response deleteItem(long itemId) {
+	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
+	public Response deleteItem(@HeaderParam("itemId") Integer itemId) {
+		try {
+			User user = authenticationService.getCurrentUser(tk.getName());
+			em.createNamedQuery(Item.DELETE_BY_ID, Item.class).setParameter("id", BigInteger.valueOf(itemId).intValue())
+					.setParameter("seller", user).executeUpdate();
+		} catch (Exception e) {
+
+		}
 		return Response.ok().build();
 	}
 

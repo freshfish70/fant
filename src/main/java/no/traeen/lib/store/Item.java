@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
@@ -28,7 +30,13 @@ import no.traeen.lib.users.User;
 /* Represents a sellable/buyable item in the store */
 @Entity
 @Table(name = "items")
+@NamedQuery(name = Item.FIND_BY_SELLER, query = "SELECT i FROM Item i WHERE i.seller = :seller")
+@NamedQuery(name = Item.DELETE_BY_ID, query = "DELETE FROM Item i WHERE i.id = :id AND i.seller = :seller")
+
 public class Item implements Serializable {
+
+	public static final String FIND_BY_SELLER = "Item.FindBySeller";
+	public static final String DELETE_BY_ID = "Item.DeleteById";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
