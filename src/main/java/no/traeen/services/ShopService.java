@@ -1,0 +1,197 @@
+package no.traeen.services;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.activation.DataHandler;
+import javax.activation.MimetypesFileTypeMap;
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Form;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import com.ibm.websphere.jaxrs20.multipart.IAttachment;
+import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
+import org.glassfish.jersey.media.multipart.ContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
+import javax.security.enterprise.identitystore.IdentityStoreHandler;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
+
+import no.traeen.lib.resource.Image;
+import no.traeen.lib.store.Item;
+import no.traeen.lib.users.User;
+
+@Path("shop")
+@ApplicationScoped
+@Transactional(Transactional.TxType.REQUIRED)
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+// @MultipartConfig()
+public class ShopService {
+
+	private final String IMAGE_PATH = "images/items/";
+	@Inject
+	IdentityStoreHandler identityStoreHandler;
+
+	@Inject
+	@ConfigProperty(name = "mp.jwt.verify.issuer", defaultValue = "issuer")
+	String issuer;
+
+	@PersistenceContext
+	EntityManager em;
+
+	@Inject
+	JsonWebToken tk;
+
+	@POST
+	@Path("purchase")
+	public Response purchaseItem(long itemId) {
+		return Response.ok().build();
+	}
+
+	@POST
+	@Path("additem")
+	@Consumes({ MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON })
+	public Response addItem(@HeaderParam("name") String name, @HeaderParam("description") String description,
+			@HeaderParam("price") float price, IMultipartBody multipartBody, @Context HttpServletRequest re) {
+
+		Object id = BigInteger.valueOf(1);
+		User user = em.find(User.class, (id));
+		Item item = new Item(name, description, price, user);
+		Set<Image> images = saveImages(multipartBody);
+		for (Image image : images) {
+			image.setOwner(item);
+		}
+		item.setImage(images);
+		em.persist(item);
+		return Response.ok().build();
+	}
+
+	private Set<Image> saveImages(IMultipartBody multipartBody) {
+
+		List<IAttachment> attachments = multipartBody.getAllAttachments();
+		InputStream stream = null;
+		Set<Image> images = new HashSet<>();
+
+		File directory = new File(IMAGE_PATH);
+		if (!directory.exists()) {
+			directory.mkdirs();
+		}
+		for (Iterator<IAttachment> it = attachments.iterator(); it.hasNext();) {
+			try {
+				IAttachment attachment = it.next();
+				if (attachment == null) {
+					continue;
+				}
+				DataHandler dataHandler = attachment.getDataHandler();
+				stream = dataHandler.getInputStream();
+
+				MultivaluedMap<String, String> map = attachment.getHeaders();
+
+				String fileName = null;
+				String formElementName = null;
+				String[] contentDisposition = map.getFirst("Content-Disposition").split(";");
+
+				for (String tempName : contentDisposition) {
+					try {
+						String[] names = tempName.split("=");
+						formElementName = names[1].trim().replaceAll("\"", "");
+						if ((tempName.trim().startsWith("filename"))) {
+							fileName = formElementName;
+						}
+					} catch (Exception e) {
+						continue;
+					}
+				}
+				if (fileName != null) {
+					String pid = UUID.randomUUID().toString();
+					String fullFileName = IMAGE_PATH + pid + "-" + fileName.trim();
+					Image image = new Image();
+					MediaType mediatype = attachment.getContentType();
+					image.setMimeType(mediatype.toString());
+					Files.copy(stream, Paths.get(fullFileName));
+					images.add(image);
+
+				}
+				if (stream != null) {
+					System.out.println("Closing stream");
+					stream.close();
+				}
+
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		return images;
+	}
+
+	// @POST
+	// @Path("te")
+	// @Consumes(MediaType.MULTIPART_FORM_DATA)
+	// @Produces(MediaType.APPLICATION_JSON)
+	// public Response te(@FormDataParam("image") InputStream fileStream) {
+	// try {
+	// String name = details.getName();
+	// Files.copy(fileStream, Paths.get(name));
+	// } catch (IOException e) {
+	// // TODO Auto-generated catch block
+	// e.printStackTrace();
+	// }
+	// return Response.ok(details).build();
+	// // return Response.ok().build();
+	// }
+
+	@POST
+	@Path("getitem")
+	public Response getItem(@HeaderParam("id") Integer id) {
+		Object nid = BigInteger.valueOf(id);
+		// Item w = em.find(Item.class, (nid));
+		// Item e = new Item(name, description, price, w);
+		// em.persist(e);
+		return Response.ok().build();
+	}
+
+	@DELETE
+	@Path("deleteitem")
+	public Response deleteItem(long itemId) {
+		return Response.ok().build();
+	}
+
+}
