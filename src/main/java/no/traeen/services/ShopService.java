@@ -1,15 +1,10 @@
 package no.traeen.services;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+
 import java.math.BigInteger;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -19,12 +14,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -48,6 +45,7 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import no.traeen.lib.resource.Image;
 import no.traeen.lib.store.Item;
+import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
 
 @Path("shop")
@@ -84,11 +82,11 @@ public class ShopService {
 	@POST
 	@Path("additem")
 	@Consumes({ MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON })
+	@RolesAllowed({ Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
 	public Response addItem(@HeaderParam("name") String name, @HeaderParam("description") String description,
 			@HeaderParam("price") float price, IMultipartBody multipartBody, @Context HttpServletRequest re) {
 
-		Object id = BigInteger.valueOf(1);
-		User user = em.find(User.class, (id));
+		User user = authenticationService.getCurrentUser(tk.getName());
 		Item item = new Item(name, description, price, user);
 		Set<Image> images = saveImages(multipartBody);
 		for (Image image : images) {
