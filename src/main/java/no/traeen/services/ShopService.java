@@ -198,7 +198,7 @@ public class ShopService {
 
 	@GET
 	@Path("getitem")
-	public Response getItem(@HeaderParam("id") Integer id) {
+	public Response getItem(@QueryParam("id") Integer id) {
 		Object itemId = BigInteger.valueOf(id);
 		Item item = em.find(Item.class, (itemId));
 		return Response.ok(item).build();
