@@ -19,6 +19,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -26,6 +27,7 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import javax.ws.rs.core.Response;
@@ -86,6 +88,31 @@ public class ShopService {
 			item.setBuyer(user);
 			em.persist(item);
 		}
+		return Response.ok().build();
+	}
+
+	@GET
+	@Path("getitems")
+	public Response getItems(@QueryParam("page") int page) {
+		Long totalItems = em.createNamedQuery(Item.COUNT_TOTAL_ITEMS, Long.class).getSingleResult();
+		int pageSize = 10;
+		int lower = 0;
+		if (page < 0)
+			page = 0;
+
+		if (page > 0) {
+			lower = page * pageSize;
+		}
+
+		try {
+			TypedQuery<Item> tq = em.createNamedQuery(Item.GET_ALL_DESC, Item.class);
+			tq.setMaxResults(pageSize);
+			tq.setFirstResult(lower);
+			return Response.ok(tq.getResultList()).build();
+		} catch (Exception e) {
+
+		}
+
 		return Response.ok().build();
 	}
 
