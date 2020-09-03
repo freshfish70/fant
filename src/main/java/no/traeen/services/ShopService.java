@@ -94,17 +94,21 @@ public class ShopService {
 	@GET
 	@Path("getitems")
 	public Response getItems(@QueryParam("page") int page) {
-		Long totalItems = em.createNamedQuery(Item.COUNT_TOTAL_ITEMS, Long.class).getSingleResult();
-		int pageSize = 10;
-		int lower = 0;
-		if (page < 0)
-			page = 0;
-
-		if (page > 0) {
-			lower = page * pageSize;
-		}
-
 		try {
+			Long totalItems = em.createNamedQuery(Item.COUNT_TOTAL_ITEMS, Long.class).getSingleResult();
+			int pageSize = 10;
+			int totalPages = (int) Math.ceil(totalItems / pageSize);
+			int lower = 0;
+			if (page < 1) {
+				page = 1;
+			}
+			if (page >= 1) {
+				lower = (page - 1) * pageSize;
+				if (lower > totalItems) {
+					lower = totalPages * pageSize;
+				}
+			}
+
 			TypedQuery<Item> tq = em.createNamedQuery(Item.GET_ALL_DESC, Item.class);
 			tq.setMaxResults(pageSize);
 			tq.setFirstResult(lower);
