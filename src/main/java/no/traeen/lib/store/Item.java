@@ -34,11 +34,15 @@ import no.traeen.lib.users.User;
 @Table(name = "items")
 @NamedQuery(name = Item.FIND_BY_SELLER, query = "SELECT i FROM Item i WHERE i.seller = :seller")
 @NamedQuery(name = Item.DELETE_BY_ID, query = "DELETE FROM Item i WHERE i.id = :id AND i.seller = :seller")
+@NamedQuery(name = Item.GET_ALL_DESC, query = "SELECT i FROM Item i ORDER BY i.id DESC")
+@NamedQuery(name = Item.COUNT_TOTAL_ITEMS, query = "SELECT count(i.id) from Item i")
 
 public class Item implements Serializable {
 
 	public static final String FIND_BY_SELLER = "Item.FindBySeller";
 	public static final String DELETE_BY_ID = "Item.DeleteById";
+	public static final String GET_ALL_DESC = "Item.GetPaginatedItems";
+	public static final String COUNT_TOTAL_ITEMS = "Item.CountTotalItems";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
