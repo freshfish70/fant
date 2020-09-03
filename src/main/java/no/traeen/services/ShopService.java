@@ -55,7 +55,6 @@ import no.traeen.lib.users.User;
 @Transactional(Transactional.TxType.REQUIRED)
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-// @MultipartConfig()
 public class ShopService {
 
 	private final String IMAGE_PATH = "images/items/";
