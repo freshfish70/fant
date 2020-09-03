@@ -78,12 +78,11 @@ public class ShopService {
 	@POST
 	@Path("buyitem")
 	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
-	public Response purchaseItem(@HeaderParam("itemId") Integer itemId) {
+	public Response purchaseItem(@HeaderParam("id") Integer itemId) {
 
 		User user = authenticationService.getCurrentUser(tk.getName());
 		Item item = em.find(Item.class, BigInteger.valueOf(itemId));
-		System.out.println(item);
-		System.out.println(user);
+		item.setSold(true);
 		if (!(item.getSeller().getId().equals(user.getId()))) {
 			item.setBuyer(user);
 			em.persist(item);
