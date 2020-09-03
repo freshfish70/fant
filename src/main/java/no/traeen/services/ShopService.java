@@ -174,11 +174,15 @@ public class ShopService {
 				}
 				if (fileName != null) {
 					String pid = UUID.randomUUID().toString();
-					String fullFileName = IMAGE_PATH + pid + "-" + fileName.trim();
+					String newName = pid + "-" + fileName.trim();
+					String fullFileName = IMAGE_PATH + newName;
 					Image image = new Image();
 					MediaType mediatype = attachment.getContentType();
+
+					long size = Files.copy(stream, Paths.get(fullFileName));
+					image.setName(newName);
 					image.setMimeType(mediatype.toString());
-					Files.copy(stream, Paths.get(fullFileName));
+					image.setSize(size);
 					images.add(image);
 
 				}
