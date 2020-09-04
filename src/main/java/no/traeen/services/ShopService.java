@@ -165,14 +165,14 @@ public class ShopService {
 			@HeaderParam("price") float price, IMultipartBody multipartBody, @Context HttpServletRequest request) {
 		ResponseBuilder resp;
 		try {
-		User user = authenticationService.getCurrentUser(tk.getName());
-		Item item = new Item(name, description, price, user);
-		Set<Image> images = saveImages(multipartBody);
-		for (Image image : images) {
-			image.setOwner(item);
-		}
-		item.setImage(images);
-		em.persist(item);
+			User user = authenticationService.getCurrentUser(tk.getName());
+			Item item = new Item(name, description, price, user);
+			Set<Image> images = saveImages(multipartBody);
+			for (Image image : images) {
+				image.setOwner(item);
+			}
+			item.setImage(images);
+			em.persist(item);
 			resp = Response.ok(new DataResponse().getResponse());
 		} catch (Exception e) {
 			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not store item")).getResponse());
@@ -243,12 +243,24 @@ public class ShopService {
 		return images;
 	}
 
+	/**
+	 * Returns an item with given id, if it is found. Else return nothing, with
+	 * error.
+	 * 
+	 * @param id the id of the item
+	 * @return return Response
+	 */
 	@GET
 	@Path("getitem")
 	public Response getItem(@QueryParam("id") Integer id) {
-		Object itemId = BigInteger.valueOf(id);
-		Item item = em.find(Item.class, (itemId));
-		return Response.ok(item).build();
+		ResponseBuilder resp;
+		Item item = em.find(Item.class, BigInteger.valueOf(id));
+		if (item == null) {
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("No items with id " + id)).getResponse());
+		} else {
+			resp = Response.ok(new DataResponse(item).getResponse());
+		}
+		return resp.build();
 	}
 
 	@DELETE
