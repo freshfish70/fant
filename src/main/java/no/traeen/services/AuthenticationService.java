@@ -105,6 +105,7 @@ public class AuthenticationService {
 	}
 
 	/**
+	 * Generates a JWT token and returns it, else empty string
 	 * 
 	 * @param name    name of the subject
 	 * @param groups  groups to include in the JWT
@@ -121,30 +122,42 @@ public class AuthenticationService {
 					.signWith(keyService.getKeyManager().getPrivateKey());
 			return jb.compact();
 		} catch (InvalidKeyException t) {
-			// log.log(Level.SEVERE, "Failed to create token", t);
-			// throw new RuntimeException("Failed to create token", t);
+
 		}
 		return "";
 	}
 
+	/**
+	 * Creates a new userin the system.
+	 * 
+	 * @param firstname the first name of the user
+	 * @param lastname  the last name of the user
+	 * @param password  desired password for the user
+	 * @param email     email for the user
+	 * @return returns ok, or error if invalid creation
+	 */
 	@POST
 	@Path("create")
 	public Response createUser(@HeaderParam("firstname") String firstname, @HeaderParam("lastname") String lastname,
 			@HeaderParam("password") String password, @HeaderParam("email") String email) {
+		ResponseBuilder resp;
 		try {
 			User user = em.createNamedQuery(User.USER_BY_EMAIL, User.class).setParameter("email", email)
 					.getSingleResult();
-			// Return error
+			resp = Response.ok(
+					new ErrorResponse(new ErrorMessage("User already exist, please try another email")).getResponse());
 		} catch (NoResultException e) {
 			User newUser = new User(email, firstname, lastname, password);
 			Group usergroup = em.find(Group.class, Group.USER_GROUP_NAME);
 			newUser.setPassword(hasher.generate(password.toCharArray()));
 			newUser.getGroups().add(usergroup);
 			em.merge(newUser);
+			resp = Response.ok(new DataResponse("Successfully created user").getResponse());
 		} catch (PersistenceException e) {
-			// Return Error
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("Unexpected error creating the user")).getResponse())
+					.status(500);
 		}
-		return Response.ok().build();
+		return resp.build();
 
 	}
 
