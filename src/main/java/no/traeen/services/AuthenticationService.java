@@ -38,6 +38,9 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.InvalidKeyException;
+import no.traeen.lib.response.DataResponse;
+import no.traeen.lib.response.ErrorResponse;
+import no.traeen.lib.response.errors.ErrorMessage;
 import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
 
@@ -81,17 +84,21 @@ public class AuthenticationService {
 	public Response login(@HeaderParam("email") String email, @HeaderParam("password") String password,
 			@Context HttpServletRequest request) {
 
-		ResponseBuilder response = Response.ok("...");
+		ResponseBuilder response;
 
 		try {
 			CredentialValidationResult result = identityStoreHandler
 					.validate(new UsernamePasswordCredential(email, password));
 			if (result.getStatus() == Status.VALID) {
 				String token = generateToken(email, result.getCallerGroups(), request);
-				response = Response.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+				response = Response.ok(new DataResponse().getResponse()).header(HttpHeaders.AUTHORIZATION,
+						"Bearer " + token);
+			} else {
+				response = Response.ok(new ErrorResponse(new ErrorMessage("Wrong username / password")).getResponse());
 			}
 		} catch (Exception e) {
-			response = Response.status(500);
+			response = Response.ok(new ErrorResponse(new ErrorMessage("Unexpected login error")).getResponse())
+					.status(500);
 		}
 
 		return response.build();
