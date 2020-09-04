@@ -17,6 +17,10 @@ import javax.activation.DataHandler;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.bind.JsonbBuilder;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -32,6 +36,7 @@ import javax.ws.rs.core.Context;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Response.Status;
 
 import com.ibm.websphere.jaxrs20.multipart.IAttachment;
 import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
@@ -103,9 +108,16 @@ public class ShopService {
 		return resp.build();
 	}
 
+	/**
+	 * Returns all items on given pagination page. A page has a page size.
+	 * 
+	 * @param page the page to get items from
+	 * @return returns Reponse
+	 */
 	@GET
 	@Path("getitems")
 	public Response getItems(@QueryParam("page") int page) {
+		ResponseBuilder resp;
 		try {
 			Long totalItems = em.createNamedQuery(Item.COUNT_TOTAL_ITEMS, Long.class).getSingleResult();
 			int pageSize = 10;
@@ -124,12 +136,14 @@ public class ShopService {
 			TypedQuery<Item> tq = em.createNamedQuery(Item.GET_ALL_DESC, Item.class);
 			tq.setMaxResults(pageSize);
 			tq.setFirstResult(lower);
-			return Response.ok(tq.getResultList()).build();
+			List<Item> items = tq.getResultList();
+			resp = Response.ok(new DataResponse(items).getResponse());
 		} catch (Exception e) {
-
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not get items")).getResponse())
+					.status(Status.NOT_FOUND);
 		}
 
-		return Response.ok().build();
+		return resp.build();
 	}
 
 	@POST
