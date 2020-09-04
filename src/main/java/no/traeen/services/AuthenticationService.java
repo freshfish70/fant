@@ -168,21 +168,38 @@ public class AuthenticationService {
 		return Response.ok(tk.getGroups()).build();
 	}
 
+	/**
+	 * Returns the current logged in user
+	 * 
+	 * @return
+	 */
 	@GET
 	@Path("currentuser")
-	@RolesAllowed(value = { Group.USER_GROUP_NAME })
-	@Produces(MediaType.APPLICATION_JSON)
-	public User getCurrentUser() {
-		return getCurrentUser(tk.getName());
+	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.USER_GROUP_NAME })
+	public Response getCurrentUser() {
+		ResponseBuilder resp;
+		User user = getCurrentUser(tk.getName());
+		if (user == null) {
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not find user")))
+					.status(javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR);
+		} else {
+			resp = Response.ok(new DataResponse(user).getResponse());
+		}
+		return resp.build();
 	}
 
+	/**
+	 * Returns the user bu the given email or null if not found
+	 * 
+	 * @param email the email of the user
+	 * @return
+	 */
 	public User getCurrentUser(String email) {
 		try {
 			return em.createNamedQuery(User.USER_BY_EMAIL, User.class).setParameter("email", email).getSingleResult();
 		} catch (Exception e) {
 		}
 		return null;
-
 	}
 
 	@PUT
@@ -190,7 +207,7 @@ public class AuthenticationService {
 	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
 	public Response changePassword(@HeaderParam("password") String newPassword) {
 
-		User user = getCurrentUser();
+		User user = getCurrentUser(tk.getName());
 		user.setPassword(hasher.generate(newPassword.toCharArray()));
 		em.merge(user);
 		return Response.ok().build();
