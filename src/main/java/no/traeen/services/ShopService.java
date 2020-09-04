@@ -16,12 +16,9 @@ import java.util.UUID;
 import javax.activation.DataHandler;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
-import javax.faces.flow.builder.ReturnBuilder;
+
 import javax.inject.Inject;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.bind.JsonbBuilder;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -44,7 +41,6 @@ import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.flywaydb.core.api.ErrorCode;
 
 import javax.security.enterprise.identitystore.IdentityStoreHandler;
 
@@ -60,7 +56,6 @@ import no.traeen.lib.response.errors.ErrorMessage;
 import no.traeen.lib.store.Item;
 import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
-import no.traeen.lib.adapters.ImageObjectAdapter;
 
 @Path("shop")
 @ApplicationScoped
