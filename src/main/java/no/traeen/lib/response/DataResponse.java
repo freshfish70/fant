@@ -17,6 +17,10 @@ public class DataResponse extends AbstractResponse {
 
 	private Data response;
 
+	public DataResponse() {
+		response = new Data("");
+	}
+
 	public DataResponse(Object data) {
 		response = new Data(data);
 	}
