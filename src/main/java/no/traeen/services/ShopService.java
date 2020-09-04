@@ -146,13 +146,25 @@ public class ShopService {
 		return resp.build();
 	}
 
+	/**
+	 * Adds a new items for sale. All items requires a name/title, a description, a
+	 * price, and image(s).
+	 * 
+	 * @param name          the name of the item
+	 * @param description   decription of the item
+	 * @param price         the price to sell for
+	 * @param multipartBody attachements
+	 * @param request       the http request
+	 * @return return Response
+	 */
 	@POST
 	@Path("additem")
 	@Consumes({ MediaType.MULTIPART_FORM_DATA, MediaType.APPLICATION_JSON })
 	@RolesAllowed({ Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
 	public Response addItem(@HeaderParam("name") String name, @HeaderParam("description") String description,
-			@HeaderParam("price") float price, IMultipartBody multipartBody, @Context HttpServletRequest re) {
-
+			@HeaderParam("price") float price, IMultipartBody multipartBody, @Context HttpServletRequest request) {
+		ResponseBuilder resp;
+		try {
 		User user = authenticationService.getCurrentUser(tk.getName());
 		Item item = new Item(name, description, price, user);
 		Set<Image> images = saveImages(multipartBody);
@@ -161,7 +173,12 @@ public class ShopService {
 		}
 		item.setImage(images);
 		em.persist(item);
-		return Response.ok().build();
+			resp = Response.ok(new DataResponse().getResponse());
+		} catch (Exception e) {
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not store item")).getResponse());
+		}
+
+		return resp.build();
 	}
 
 	private Set<Image> saveImages(IMultipartBody multipartBody) {
