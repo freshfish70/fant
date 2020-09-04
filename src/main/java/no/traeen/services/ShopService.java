@@ -31,12 +31,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import com.ibm.websphere.jaxrs20.multipart.IAttachment;
 import com.ibm.websphere.jaxrs20.multipart.IMultipartBody;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.flywaydb.core.api.ErrorCode;
 
 import javax.security.enterprise.identitystore.IdentityStoreHandler;
 
@@ -46,9 +48,13 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import no.traeen.lib.resource.Image;
+import no.traeen.lib.response.DataResponse;
+import no.traeen.lib.response.ErrorResponse;
+import no.traeen.lib.response.errors.ErrorMessage;
 import no.traeen.lib.store.Item;
 import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
+import no.traeen.lib.adapters.ImageObjectAdapter;
 
 @Path("shop")
 @ApplicationScoped
@@ -77,16 +83,24 @@ public class ShopService {
 	@POST
 	@Path("buyitem")
 	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
-	public Response purchaseItem(@HeaderParam("id") Integer itemId) {
+	public Response purchaseItem(@HeaderParam("id") int itemId) {
 
+		ResponseBuilder resp = null;
 		User user = authenticationService.getCurrentUser(tk.getName());
 		Item item = em.find(Item.class, BigInteger.valueOf(itemId));
-		item.setSold(true);
-		if (!(item.getSeller().getId().equals(user.getId()))) {
+		if (item == null) {
+			ErrorMessage message = new ErrorMessage("No item");
+			resp = Response.ok(new ErrorResponse(message));
+		} else if (!(item.getSeller().getId().equals(user.getId()))) {
 			item.setBuyer(user);
+			item.setSold(true);
 			em.persist(item);
+			Response.ok(new DataResponse("ok"));
+		} else {
+			ErrorMessage message = new ErrorMessage("Cant buy own item");
+			resp = Response.ok(new ErrorResponse(message));
 		}
-		return Response.ok().build();
+		return resp.build();
 	}
 
 	@GET
