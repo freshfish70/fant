@@ -16,6 +16,7 @@ import java.util.UUID;
 import javax.activation.DataHandler;
 import javax.annotation.security.RolesAllowed;
 import javax.enterprise.context.ApplicationScoped;
+import javax.faces.flow.builder.ReturnBuilder;
 import javax.inject.Inject;
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -263,18 +264,34 @@ public class ShopService {
 		return resp.build();
 	}
 
+	/**
+	 * Deletes an item by id from the store. The item can only be deleted by the
+	 * owner of the item.
+	 * 
+	 * @param itemId the id of the item to delete
+	 * @return
+	 */
 	@DELETE
 	@Path("deleteitem")
 	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
 	public Response deleteItem(@HeaderParam("itemId") Integer itemId) {
+		ResponseBuilder resp;
 		try {
 			User user = authenticationService.getCurrentUser(tk.getName());
-			em.createNamedQuery(Item.DELETE_BY_ID, Item.class).setParameter("id", BigInteger.valueOf(itemId).intValue())
-					.setParameter("seller", user).executeUpdate();
+			int updated = em.createNamedQuery(Item.DELETE_BY_ID, Item.class)
+					.setParameter("id", BigInteger.valueOf(itemId).intValue()).setParameter("seller", user)
+					.executeUpdate();
+			if (updated > 0) {
+				resp = Response.ok(new DataResponse("").getResponse());
+			} else {
+				resp = Response.ok(new ErrorResponse(new ErrorMessage("No items deleted")).getResponse());
+			}
 		} catch (Exception e) {
-
+			resp = Response.ok(
+					new ErrorResponse(new ErrorMessage("Something want wrong with deleteing item with id " + itemId))
+							.getResponse());
 		}
-		return Response.ok().build();
+		return resp.build();
 	}
 
 }
