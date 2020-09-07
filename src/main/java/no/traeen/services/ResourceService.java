@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import javax.ejb.Stateless;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -35,8 +36,7 @@ import javax.ws.rs.core.MediaType;
 import no.traeen.lib.resource.Image;
 
 @Path("resource")
-@ApplicationScoped
-@Transactional(Transactional.TxType.REQUIRED)
+@Stateless
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ResourceService {

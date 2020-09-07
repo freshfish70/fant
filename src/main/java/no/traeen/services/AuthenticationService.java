@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -45,8 +46,7 @@ import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
 
 @Path("authentication")
-@ApplicationScoped
-@Transactional(Transactional.TxType.REQUIRED)
+@Stateless
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationService {
