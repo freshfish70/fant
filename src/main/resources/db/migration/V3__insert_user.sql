@@ -1,0 +1,2 @@
+-- Insert user with password 123456789
+INSERT INTO users (firstname, lastname, email, password) VALUES ('Admin', 'Senior', 'admin@fant.no', 'PBKDF2WithHmacSHA256:2048:stCAj3Pcq7otIoFTPdaVvxf+VNBE3IpWkrJpGoqYrIs=:kPFa+mLDbctcAErGy84wc9J1gWDz0amvaEbo7nIYduk=')
