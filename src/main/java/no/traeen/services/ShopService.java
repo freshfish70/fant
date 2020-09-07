@@ -15,6 +15,8 @@ import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.annotation.security.RolesAllowed;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionManagement;
 import javax.enterprise.context.ApplicationScoped;
 
 import javax.inject.Inject;
@@ -45,10 +47,14 @@ import org.eclipse.microprofile.jwt.JsonWebToken;
 import javax.security.enterprise.identitystore.IdentityStoreHandler;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.MediaType;
+import javax.ejb.TransactionManagementType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import no.traeen.lib.communication.JavaxMail;
+import no.traeen.lib.communication.Mail;
 import no.traeen.lib.resource.Image;
 import no.traeen.lib.response.DataResponse;
 import no.traeen.lib.response.ErrorResponse;
@@ -57,9 +63,10 @@ import no.traeen.lib.store.Item;
 import no.traeen.lib.users.Group;
 import no.traeen.lib.users.User;
 
+import java.util.Properties;
+
 @Path("shop")
-@ApplicationScoped
-@Transactional(Transactional.TxType.REQUIRED)
+@Stateless
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class ShopService {
@@ -87,15 +94,19 @@ public class ShopService {
 	public Response purchaseItem(@HeaderParam("id") int itemId) {
 
 		ResponseBuilder resp = null;
-		User user = authenticationService.getCurrentUser(tk.getName());
+		User buyer = authenticationService.getCurrentUser(tk.getName());
 		Item item = em.find(Item.class, BigInteger.valueOf(itemId));
 		if (item == null) {
 			ErrorMessage message = new ErrorMessage("No item");
 			resp = Response.ok(new ErrorResponse(message));
-		} else if (!(item.getSeller().getId().equals(user.getId()))) {
-			item.setBuyer(user);
+		} else if (!(item.getSeller().getId().equals(buyer.getId()))) {
+			item.setBuyer(buyer);
 			item.setSold(true);
 			em.persist(item);
+			JavaxMail mail = new JavaxMail(item.getSeller().getEmail(), "admin@fant.no",
+					"Item: " + item.getName() + " was sold", "Your items was sold.");
+			mail.setHost("fant_mail");
+			mail.send();
 			Response.ok(new DataResponse("ok"));
 		} else {
 			ErrorMessage message = new ErrorMessage("Cant buy own item");
