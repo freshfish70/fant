@@ -1,5 +1,3 @@
-
-
 create table items
 (
 	id serial not null
@@ -25,17 +23,19 @@ alter table items owner to postgres;
 create unique index items_id_uindex
 	on items (id);
 
+
 create table images
 (
 	id serial not null
 		constraint images_pk
 			primary key,
 	name varchar,
-	"mimeType" varchar,
+	mime_type varchar,
 	size real,
 	owner integer
 		constraint images_items_id_fk
 			references items
+				on update cascade on delete cascade
 );
 
 alter table images owner to postgres;
