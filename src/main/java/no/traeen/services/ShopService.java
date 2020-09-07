@@ -107,7 +107,7 @@ public class ShopService {
 					"Item: " + item.getName() + " was sold", "Your items was sold.");
 			mail.setHost("fant_mail");
 			mail.send();
-			Response.ok(new DataResponse("ok"));
+			resp = Response.ok(new DataResponse("ok"));
 		} else {
 			ErrorMessage message = new ErrorMessage("Cant buy own item");
 			resp = Response.ok(new ErrorResponse(message));
