@@ -6,6 +6,7 @@ services:
     image: postgres
     restart: always
     environment:
+      POSTGRES_DB: fant
       POSTGRES_PASSWORD: example
     networks:
       - fant_backend
