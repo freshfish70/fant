@@ -25,7 +25,7 @@ services:
     networks:
       - fant_backend
     volumes:
-      - target:/config/dropins
+      - ./target:/config/dropins
     ports:
       - 9080:9080
 networks:
