@@ -16,7 +16,7 @@
 
   <dataSource id="DefaultDataSource" jndiName="jdbc/postgresql">
     <jdbcDriver libraryRef="postgresql-library" />
-    <properties.postgresql serverName="fant_db_1" portNumber="5432" databaseName="fant" user="${env.POSTGRES_USER}" password="${env.POSTGRES_PASSWORD}" />
+    <properties.postgresql serverName="fant_db" portNumber="5432" databaseName="fant" user="${env.POSTGRES_USER}" password="${env.POSTGRES_PASSWORD}" />
   </dataSource>
 
   <!-- POSTGRES DRIVER -->
