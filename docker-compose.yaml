@@ -9,7 +9,9 @@ services:
       POSTGRES_DB: fant
       POSTGRES_PASSWORD: example
     networks:
-      - fant_backend
+      - backend
+    ports:
+      - 5432:5432
   mail:
     container_name: fant_mail
     restart: always
