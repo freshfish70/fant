@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: fant_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: fant
+      POSTGRES_PASSWORD: example
+    networks:
+      - backend
+    ports:
+      - 5432:5432
+  mail:
+    container_name: fant_mail
+    restart: always
+    image: namshi/smtp
+    networks:
+      - backend
+  fant:
+    build: .
+    container_name: fant
+    image: no.traeen/fant
+    networks:
+      - backend
+    volumes:
+      - ./target:/config/dropins
+    ports:
+      - 9080:9080
+networks:
+  backend:
+    driver: bridge

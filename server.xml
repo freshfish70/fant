@@ -4,9 +4,25 @@
   <featureManager>
     <feature>javaee-8.0</feature>
     <feature>microProfile-3.3</feature>
+    <feature>jaxrs-2.1</feature>
+    <feature>jsonp-1.1</feature>
+    <feature>cdi-2.0</feature>
+    <feature>jpa-2.2</feature>
   </featureManager>
 
-  <httpEndpoint id="defaultHttpEndpoint" httpPort="9080" httpsPort="9443"/>
+  <httpEndpoint id="defaultHttpEndpoint" httpPort="9080" httpsPort="9443" />
 
-  <quickStartSecurity userName="duke" userPassword="dukeduke"/>
+  <quickStartSecurity userName="duke" userPassword="dukeduke" />
+
+  <dataSource id="DefaultDataSource" jndiName="jdbc/postgresql">
+    <jdbcDriver libraryRef="postgresql-library" />
+    <properties.postgresql serverName="fant_db" portNumber="5432" databaseName="fant" user="${env.POSTGRES_USER}" password="${env.POSTGRES_PASSWORD}" />
+  </dataSource>
+
+  <!-- POSTGRES DRIVER -->
+  <library id="postgresql-library">
+    <file name="${server.config.dir}/postgresql-42.2.16.jar" />
+  </library>
+
+  <mpJwt id="defaultMpJwt" audiences="aud"></mpJwt>
 </server>
