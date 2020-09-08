@@ -1,4 +1,4 @@
-version: "3.1"
+version: '3.1'
 
 services:
   db:
@@ -17,17 +17,17 @@ services:
     restart: always
     image: namshi/smtp
     networks:
-      - fant_backend
+      - backend
   fant:
     build: .
     container_name: fant
     image: no.traeen/fant
     networks:
-      - fant_backend
+      - backend
     volumes:
       - ./target:/config/dropins
     ports:
       - 9080:9080
 networks:
-  fant_backend:
+  backend:
     driver: bridge
