@@ -75,7 +75,7 @@ public class ResourceService {
 	public Response getImage(@PathParam("id") int id, @QueryParam("width") int width) {
 		Image im = em.find(Image.class, BigInteger.valueOf(id));
 		if (im != null) {
-			String[] split = im.getName().split(".");
+			String[] split = im.getName().split("[.]");
 			String ext = split[split.length - 1];
 			StreamingOutput result = (OutputStream os) -> {
 				java.nio.file.Path image = Paths.get(imageStoragePath, im.getName());
