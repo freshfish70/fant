@@ -55,6 +55,7 @@ public class User implements Serializable {
 	private String password;
 
 	@ManyToMany
+	@JsonbTransient
 	@JoinTable(name = "user_groups", joinColumns = @JoinColumn(name = "email", referencedColumnName = "email"), inverseJoinColumns = @JoinColumn(name = "name", referencedColumnName = "name"))
 	List<Group> groups;
 
