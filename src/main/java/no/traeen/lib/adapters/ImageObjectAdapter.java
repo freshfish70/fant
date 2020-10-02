@@ -21,7 +21,7 @@ public class ImageObjectAdapter implements JsonbAdapter<Set<Image>, JsonArray> {
 	@Override
 	public JsonArray adaptToJson(Set<Image> mos) throws Exception {
 		JsonArrayBuilder result = Json.createArrayBuilder();
-		System.out.println(mos);
+		
 		if (mos == null) {
 			return result.build();
 		}
