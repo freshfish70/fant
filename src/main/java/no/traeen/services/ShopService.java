@@ -29,6 +29,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -88,29 +89,33 @@ public class ShopService {
 	@Inject
 	AuthenticationService authenticationService;
 
-	@POST
+	@PUT
 	@Path("buyitem")
 	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
-	public Response purchaseItem(@HeaderParam("id") int itemId) {
+	public Response purchaseItem(@HeaderParam("id") String itemId) {
+		int itemIdInt = -1;
+		try {
+			itemIdInt = Integer.valueOf(itemId);
+		} catch (Exception e) {
+		}
 
 		ResponseBuilder resp = null;
 		User buyer = authenticationService.getCurrentUser(tk.getName());
-		Item item = em.find(Item.class, BigInteger.valueOf(itemId));
+		Item item = em.find(Item.class, BigInteger.valueOf(itemIdInt));
 		if (item == null) {
 			ErrorMessage message = new ErrorMessage("No item");
-			resp = Response.ok(new ErrorResponse(message));
+			resp = Response.ok(new ErrorResponse(message).getResponse());
 		} else if (!(item.getSeller().getId().equals(buyer.getId()))) {
 			item.setBuyer(buyer);
 			item.setSold(true);
-			em.persist(item);
+			em.merge(item);
 			JavaxMail mail = new JavaxMail(item.getSeller().getEmail(), "admin@fant.no",
 					"Item: " + item.getName() + " was sold", "Your items was sold.");
 			mail.setHost("fant_mail");
 			mail.send();
-			resp = Response.ok(new DataResponse("ok"));
+			resp = Response.ok(new DataResponse("Item was successfully purchased").getResponse());
 		} else {
-			ErrorMessage message = new ErrorMessage("Cant buy own item");
-			resp = Response.ok(new ErrorResponse(message));
+			resp = Response.ok(new ErrorResponse(new ErrorMessage("Cant buy own item")).getResponse()).status(400);
 		}
 		return resp.build();
 	}
@@ -127,7 +132,7 @@ public class ShopService {
 		ResponseBuilder resp;
 		try {
 			Long totalItems = em.createNamedQuery(Item.COUNT_TOTAL_ITEMS, Long.class).getSingleResult();
-			int pageSize = 10;
+			int pageSize = 20;
 			int totalPages = (int) Math.ceil(totalItems / pageSize);
 			int lower = 0;
 			if (page < 1) {
