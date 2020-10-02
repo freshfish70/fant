@@ -288,7 +288,7 @@ public class ShopService {
 					.setParameter("id", BigInteger.valueOf(itemId).intValue()).setParameter("seller", user)
 					.executeUpdate();
 			if (updated > 0) {
-				resp = Response.ok(new DataResponse("").getResponse());
+				resp = Response.ok(new DataResponse("Deleted item").getResponse());
 			} else {
 				resp = Response.ok(new ErrorResponse(new ErrorMessage("No items deleted")).getResponse());
 			}
