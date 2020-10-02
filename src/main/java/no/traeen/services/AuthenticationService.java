@@ -85,16 +85,16 @@ public class AuthenticationService {
 			@Context HttpServletRequest request) {
 
 		ResponseBuilder response;
-
 		try {
 			CredentialValidationResult result = identityStoreHandler
 					.validate(new UsernamePasswordCredential(email, password));
 			if (result.getStatus() == Status.VALID) {
 				String token = generateToken(email, result.getCallerGroups(), request);
-				response = Response.ok(new DataResponse().getResponse()).header(HttpHeaders.AUTHORIZATION,
-						"Bearer " + token);
+				response = Response.ok(new DataResponse("Successfully logged in").getResponse())
+						.header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
 			} else {
-				response = Response.ok(new ErrorResponse(new ErrorMessage("Wrong username / password")).getResponse());
+				response = Response.ok(new ErrorResponse(new ErrorMessage("Wrong username / password")).getResponse())
+						.status(400);
 			}
 		} catch (Exception e) {
 			response = Response.ok(new ErrorResponse(new ErrorMessage("Unexpected login error")).getResponse())
@@ -175,7 +175,7 @@ public class AuthenticationService {
 	 */
 	@GET
 	@Path("currentuser")
-	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.USER_GROUP_NAME })
+	@RolesAllowed(value = { Group.USER_GROUP_NAME, Group.ADMIN_GROUP_NAME })
 	public Response getCurrentUser() {
 		ResponseBuilder resp;
 		User user = getCurrentUser(tk.getName());
@@ -210,7 +210,7 @@ public class AuthenticationService {
 		User user = getCurrentUser(tk.getName());
 		user.setPassword(hasher.generate(newPassword.toCharArray()));
 		em.merge(user);
-		return Response.ok().build();
+		return Response.ok(new DataResponse("Successfully changed password").getResponse()).build();
 
 	}
 }
