@@ -180,7 +180,7 @@ public class ShopService {
 			}
 			item.setImage(images);
 			em.persist(item);
-			resp = Response.ok(new DataResponse().getResponse());
+			resp = Response.ok(new DataResponse("Added item: " + item.getName()).getResponse());
 		} catch (Exception e) {
 			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not store item")).getResponse());
 		}
