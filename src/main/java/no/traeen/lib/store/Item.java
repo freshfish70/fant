@@ -127,7 +127,7 @@ public class Item implements Serializable {
 		this.image = image;
 	}
 
-	public boolean isSold() {
+	public boolean getSold() {
 		return this.sold;
 	}
 
