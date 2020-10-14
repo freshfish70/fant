@@ -26,6 +26,7 @@ public class AuthenticationStartup {
 	 * Makes sure that our user grous are added to the database.
 	 */
 	public void persistUsergroups() {
+		// Thread.sleep(5000);
 		long groups = (long) em.createQuery("SELECT count(g.name) from Group g").getSingleResult();
 		if (groups != Group.GROUPS.length) {
 			for (String group : Group.GROUPS) {

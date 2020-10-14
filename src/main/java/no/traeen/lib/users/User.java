@@ -113,7 +113,7 @@ public class User implements Serializable {
 			throw new InvalidParameterException("Email is empty or null");
 		this.email = email;
 	}
-
+	
 	public void setPassword(String password) {
 		if (password == null || password.isEmpty())
 			throw new InvalidParameterException("Password is empty or null");

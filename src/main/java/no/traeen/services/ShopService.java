@@ -185,7 +185,7 @@ public class ShopService {
 			}
 			item.setImage(images);
 			em.persist(item);
-			resp = Response.ok(new DataResponse("Added item: " + item.getName()).getResponse());
+			resp = Response.ok(new DataResponse(item).getResponse());
 		} catch (Exception e) {
 			resp = Response.ok(new ErrorResponse(new ErrorMessage("Could not store item")).getResponse());
 		}
